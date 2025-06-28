@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Fever Diagnosis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <!-- (Eliminado el bloque <style>, ya que las reglas se moverán a style.css) -->
+        <div class="patient-name">
+          <label for="patientName">Nombre Paciente</label>
+          <input type="text" id="patientName" name="patientName" value="" placeholder="Apellidos y Nombres" required style="width: 300px;">
+          <span id="savedName" style="display:none; margin-left:10px;"></span>
+        </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('patientName');
+            const saved = document.getElementById('savedName');
+            input.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter') {
+          e.preventDefault();
+          if (input.value.trim() !== "") {
+            saved.textContent = input.value;
+            saved.style.display = 'inline';
+            input.style.display = 'none';
+          } else {
+            input.focus();
+          }
+              }
+            });
+          });
+        </script>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('patientName');
+            const btn = document.getElementById('saveNameBtn');
+            const saved = document.getElementById('savedName');
+            btn.addEventListener('click', function() {
+              if(input.value.trim() !== "") {
+          saved.textContent = input.value;
+          saved.style.display = 'inline';
+          input.style.display = 'none';
+          btn.style.display = 'none';
+              }
+            });
+          });
+        </script>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <button 
+          type="button" 
+          onclick="window.location.href='index.html';" 
+          style="
+        font-size: 1em; 
+        padding: 10px 24px; 
+        border-radius: 30px; 
+        border: none; 
+        background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+        color: #fff; 
+        cursor: pointer;
+        box-shadow: 0 4px 14px 0 rgba(24,90,157,0.15);
+        transition: transform 0.15s, box-shadow 0.15s;
+          "
+          onmouseover="this.style.transform='scale(1.07)';this.style.boxShadow='0 6px 20px 0 rgba(24,90,157,0.25)';"
+          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px 0 rgba(24,90,157,0.15)';"
+        >
+          Inicio
+        </button>
+      </div>
+
+      <div class="header-right">
+        <div class="date">
+          <label for="date">Fecha</label>
+          <input type="text" id="date" name="date" readonly>
+        </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            // Get current date in Peru timezone (UTC-5)
+            const now = new Date();
+            // Convert to Peru time (UTC-5)
+            const peruOffset = -5 * 60; // in minutes
+            const localOffset = now.getTimezoneOffset();
+            const peruTime = new Date(now.getTime() + (peruOffset - localOffset) * 60000);
+            // Format as DD/MM/YYYY
+            const day = String(peruTime.getDate()).padStart(2, '0');
+            const month = String(peruTime.getMonth() + 1).padStart(2, '0');
+            const year = peruTime.getFullYear();
+            document.getElementById('date').value = `${day}/${month}/${year}`;
+          });
+        </script>
+        <div class="power-button">
+          <button title="Power Off" onclick="resetAll()" style="font-size: 1.5em; background: none; border: none; cursor: pointer;">
+            <span style="vertical-align: middle;">&#x23FB;</span>
+          </button>
+        </div>
+        <script>
+          function resetAll() {
+            // Reset patient name
+            const patientNameInput = document.getElementById('patientName');
+            const savedName = document.getElementById('savedName');
+            patientNameInput.value = '';
+            patientNameInput.style.display = '';
+            savedName.textContent = '';
+            savedName.style.display = 'none';
+            const saveNameBtn = document.getElementById('saveNameBtn');
+            if (saveNameBtn) saveNameBtn.style.display = '';
+
+            // Reset form fields
+            const form = document.getElementById('diagnosisForm');
+            if (form) form.reset();
+
+            // Reset resultadoDiagnostico
+            document.getElementById('resultadoDiagnostico').innerText = '';
+
+            // Deshabilitar campos del formulario
+            toggleFormFieldsByPatientName();
+
+            // Enfocar el input del nombre
+            patientNameInput.focus();
+          }
+        </script>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="main-content">
+
+      <!-- Left panel: Illustration and form -->
+      <section class="left-panel" style="float: left; width: 20%; box-sizing: border-box;">
+        <div class="illustration">
+          <img src="DENGUE.jpg" alt="Medical Illustration" />
+        </div>
+
+        <form id="diagnosisForm" class="form-panel" onsubmit="return false;">
+          <div class="form-columns"></div>
+
+            <div class="select-box">
+              <label for="edad">Edad:</label>
+              <input type="number" id="edad" name="edad" min="0" max="120" required disabled>
+            </div>
+
+            <div class="select-box">
+              <label for="sexo">Sexo:</label>
+              <select id="sexo" name="sexo" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="fiebre">Fiebre:</label>
+              <select id="fiebre" name="fiebre" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="No">No</option>
+          <option value="Baja">Baja</option>
+          <option value="Moderada">Moderada</option>
+          <option value="Alta">Alta</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="dolor_cabeza">Dolor de cabeza:</label>
+              <select id="dolor_cabeza" name="dolor_cabeza" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="dolor_muscular">Dolor muscular:</label>
+              <select id="dolor_muscular" name="dolor_muscular" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="escalofrios">Escalofríos:</label>
+              <select id="escalofrios" name="escalofrios" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="dolor_abdominal">Dolor abdominal:</label>
+              <select id="dolor_abdominal" name="dolor_abdominal" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="nauseas">Náuseas o vómitos:</label>
+              <select id="nauseas" name="nauseas" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="select-box">
+              <label for="diarrea">Diarrea:</label>
+              <select id="diarrea" name="diarrea" required disabled>
+          <option value="" selected disabled>Seleccione</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+              </select>
+            </div>
+
+          </div>
+          <br>
+            <button 
+              type="button" 
+              class="btn btn-primary btn-block btn-large" 
+              onclick="
+          var savedName = document.getElementById('savedName');
+          var patientNameInput = document.getElementById('patientName');
+          var nombrePaciente = '';
+          if (savedName && savedName.style.display !== 'none' && savedName.textContent.trim() !== '') {
+            nombrePaciente = savedName.textContent.trim();
+          } else if (patientNameInput && patientNameInput.value.trim() !== '') {
+            nombrePaciente = patientNameInput.value.trim();
+          }
+          if (!nombrePaciente) {
+            alert('Por favor, ingrese el nombre del paciente antes de continuar.');
+            patientNameInput.focus();
+            return false;
+          }
+          if (document.getElementById('diagnosisForm').checkValidity()) { 
+            predecirEnfermedad(); 
+          } else { 
+            document.getElementById('diagnosisForm').reportValidity(); 
+          }
+              "
+            >
+            Predecir
+            </button>
+        </form>
+        <script>
+          // Función para habilitar/deshabilitar los campos según el nombre del paciente
+          function toggleFormFieldsByPatientName() {
+            var savedName = document.getElementById('savedName');
+            var patientNameInput = document.getElementById('patientName');
+            var nombrePaciente = '';
+            if (savedName && savedName.style.display !== 'none' && savedName.textContent.trim() !== '') {
+              nombrePaciente = savedName.textContent.trim();
+            } else if (patientNameInput && patientNameInput.value.trim() !== '') {
+              nombrePaciente = patientNameInput.value.trim();
+            }
+            var fields = [
+              document.getElementById('edad'),
+              document.getElementById('sexo'),
+              document.getElementById('fiebre'),
+              document.getElementById('dolor_cabeza'),
+              document.getElementById('dolor_muscular'),
+              document.getElementById('escalofrios'),
+              document.getElementById('dolor_abdominal'),
+              document.getElementById('nauseas'),
+              document.getElementById('diarrea')
+            ];
+            for (var i = 0; i < fields.length; i++) {
+              if (fields[i]) fields[i].disabled = !nombrePaciente;
+            }
+          }
+
+          document.addEventListener('DOMContentLoaded', function() {
+            // Inicialmente deshabilitar campos
+            toggleFormFieldsByPatientName();
+
+            // Habilitar campos cuando se registre el nombre
+            var patientNameInput = document.getElementById('patientName');
+            var savedName = document.getElementById('savedName');
+
+            // Cuando el usuario presiona Enter en el input del nombre
+            patientNameInput.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter') {
+          setTimeout(toggleFormFieldsByPatientName, 100);
+              }
+            });
+
+            // Si hay un botón para guardar el nombre
+            var saveNameBtn = document.getElementById('saveNameBtn');
+            if (saveNameBtn) {
+              saveNameBtn.addEventListener('click', function() {
+          setTimeout(toggleFormFieldsByPatientName, 100);
+              });
+            }
+          });
+        </script>
+        </section>
+
+        <!-- Right panel: Diagnostic result -->
+        <section class="right-panel" style="display: inline-block; vertical-align: top; width: 48%; min-height: 100px; margin-left:2%; box-sizing: border-box;">
+          <div id="resultadoDiagnostico" style="margin-top:20px; font-weight:bold; font-size:1.2em; padding: 16px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; display: inline-block; min-width: 200px; max-width: 100%; word-break: break-word;"></div>
+        </section>
+
+        <script>
+          function predecirEnfermedad() {
+            // Obtener valores de los síntomas
+            const fiebre = document.getElementById('fiebre').value;
+            const dolor_cabeza = document.getElementById('dolor_cabeza').value;
+            const dolor_muscular = document.getElementById('dolor_muscular').value;
+            const escalofrios = document.getElementById('escalofrios').value;
+            const dolor_abdominal = document.getElementById('dolor_abdominal').value;
+            const nauseas = document.getElementById('nauseas').value;
+            const diarrea = document.getElementById('diarrea').value;
+
+            // Obtener nombre del paciente (el que se registró)
+            let nombrePaciente = '';
+            const savedName = document.getElementById('savedName');
+            const patientNameInput = document.getElementById('patientName');
+            if (savedName && savedName.style.display !== 'none' && savedName.textContent.trim() !== '') {
+              nombrePaciente = savedName.textContent.trim();
+            } else if (patientNameInput && patientNameInput.value.trim() !== '') {
+              nombrePaciente = patientNameInput.value.trim();
+            }
+
+            // Lógica simple de predicción basada en síntomas principales
+            let resultado = "";
+
+            // DENGUE: fiebre alta/moderada + dolor de cabeza + dolor muscular
+            if (
+              (fiebre === "Alta" || fiebre === "Moderada") &&
+              dolor_cabeza === "Si" &&
+              dolor_muscular === "Si"
+            ) {
+              resultado = "DENGUE";
+            }
+            // MALARIA: fiebre alta + escalofríos + dolor muscular + náuseas
+            else if (
+              fiebre === "Alta" &&
+              escalofrios === "Si" &&
+              dolor_muscular === "Si" &&
+              nauseas === "Si"
+            ) {
+              resultado = "MALARIA";
+            }
+            // TIFOIDEA: fiebre moderada/alta + dolor abdominal + diarrea
+            else if (
+              (fiebre === "Alta" || fiebre === "Moderada") &&
+              dolor_abdominal === "Si" &&
+              diarrea === "Si"
+            ) {
+              resultado = "TIFOIDEA";
+            }
+            // Si no cumple ninguna, asignar diagnóstico por prioridad de síntomas
+            else {
+              // Priorización por síntomas
+              if (dolor_muscular === "Si" && (fiebre === "Alta" || fiebre === "Moderada")) {
+          resultado = "DENGUE";
+              } else if (escalofrios === "Si" && fiebre === "Alta") {
+          resultado = "MALARIA";
+              } else if (dolor_abdominal === "Si" && (fiebre === "Alta" || fiebre === "Moderada" || diarrea === "Si")) {
+          resultado = "TIFOIDEA";
+              } else if (nauseas === "Si" && fiebre === "Alta") {
+          resultado = "MALARIA";
+              } else if (diarrea === "Si") {
+          resultado = "TIFOIDEA";
+              } else {
+          // Si no hay síntomas claros, asignar el diagnóstico menos grave
+          resultado = "DENGUE";
+              }
+            }
+
+            let resultadoFinal = '';
+            if (nombrePaciente) {
+              resultadoFinal = 'Sr ' + nombrePaciente + ' Obtuvo el diagnóstico de: ' + resultado;
+            } else {
+              resultadoFinal = resultado;
+            }
+
+            document.getElementById('resultadoDiagnostico').innerText = resultadoFinal;
+          }
+        </script>
+  </div>
+</body>
+</html>
